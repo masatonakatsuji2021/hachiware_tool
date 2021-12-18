@@ -1,4 +1,4 @@
-const core = require("../");
+const tool = require("../");
 
 var obj = {
 	aaa: {
@@ -13,9 +13,9 @@ var obj = {
 	f: true,
 };
 
-console.log("aaa.bbbb = " + core.exists(obj,"aaa.bbbb"));
-console.log("aaa.nnnn = " + core.exists(obj,"aaa.nnnn"));
-console.log("aaa.ffff.gg = " + core.exists(obj,"aaa.ffff.gg"));
-console.log("aaa.ffff.ss = " + core.exists(obj,"aaa.ffff.ss"));
+console.log("aaa.bbbb = " + tool.objExists(obj,"aaa.bbbb"));
+console.log("aaa.nnnn = " + tool.objExists(obj,"aaa.nnnn"));
+console.log("aaa.ffff.gg = " + tool.objExists(obj,"aaa.ffff.gg"));
+console.log("aaa.ffff.ss = " + tool.objExists(obj,"aaa.ffff.ss"));
 
 console.log(obj);

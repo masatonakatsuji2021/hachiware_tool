@@ -1,5 +1,9 @@
 /**
- * 
+ * ====================================================================
+ * Hachiware_tool
+ * Extension library for web framework "Hachiware ".
+ * Author : Nakatsuji Masato 
+ * ====================================================================
  */
 module.exports = {
 
@@ -104,22 +108,70 @@ module.exports = {
 	 */
 	objExists: function(object, path){
 
+		if(this.objGet(object, path) !== undefined){
+			return true;
+		}
+		else{
+			return false;
+		}
+	},
+
+	/**
+	 * objGet
+	 * @param {*} object 
+	 * @param {*} path 
+	 * @returns 
+	 */
+	objGet: function(object, path){
+
 		var obj = new Object(object);
 
 		var paths = path.split(".");
 		for(var n = 0 ; n < paths.length ; n++){
 			var p_ = paths[n];
 
-			if(obj[p_] == undefined){
-				return false;
+			if(obj[p_] === undefined){
+				return undefined;
 			}
 
 			obj = obj[p_];
 		}
 
 		if(obj != undefined){
-			return true;
+			return obj;
 		}
+	},
+
+	/**
+	 * objSet
+	 * @param {*} object 
+	 * @param {*} path 
+	 * @param {*} value 
+	 * @returns 
+	 */
+	objSet: function(object, path, value){
+
+		var obj = new Object(object);
+
+		var paths = path.split(".");
+		var firstPath = paths[0];
+
+		if(obj[firstPath] === undefined){
+			obj[firstPath] = {};
+		}
+
+		paths.shift();
+
+		var nPath = paths.join(".");
+
+		if(paths.length >= 1){
+			obj[firstPath] = this.objSet(obj[firstPath],nPath, value);
+		}
+		else{
+			obj[firstPath] = value;
+		}
+
+		return obj;
 	},
 
 };
