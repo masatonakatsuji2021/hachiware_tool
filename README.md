@@ -1,6 +1,7 @@
 # Hachiware_tool
 
 <a href="https://github.com/masatonakatsuji2021/hachiware_tool/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/masatonakatsuji2021/hachiware_tool"></a>
+<img alt="GitHub package.json version" src="https://img.shields.io/github/package-json/v/masatonakatsuji2021/hachiware_tool">
 
 Extension library for web framework "Hachiware".
 
