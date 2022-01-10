@@ -5,6 +5,7 @@
  * Author : Nakatsuji Masato 
  * ====================================================================
  */
+
 module.exports = {
 
 	/**
@@ -51,7 +52,7 @@ module.exports = {
 	 * @returns 
 	 */
 	base64Encode: function(data){
-		var res = Buffer.from(data).toString('base64') ;
+		var res = Buffer.from(data).toString('base64');
 		return res;
 	},
 
