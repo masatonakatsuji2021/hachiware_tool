@@ -175,4 +175,11 @@ module.exports = {
 		return obj;
 	},
 
+	ucFirst: function(str){
+		return str.substring(0,1).toUpperCase() + str.substring(1);
+	},
+
+	lcFirst: function(str){
+		return str.substring(0,1).toLowerCase() + str.substring(1);
+	},
 };
