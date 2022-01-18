@@ -1,6 +1,6 @@
 {
   "name": "hachiware_tool",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Extension library for web framework \"Hachiware \".",
   "main": "index.js",
   "scripts": {
