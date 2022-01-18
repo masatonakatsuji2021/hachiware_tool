@@ -1,9 +1,15 @@
 /**
- * ====================================================================
+ * ===================================================================================================
  * Hachiware_tool
+ * 
  * Extension library for web framework "Hachiware ".
- * Author : Nakatsuji Masato 
- * ====================================================================
+ * 
+ * License : MIT License. 
+ * Since   : 2022.01.15
+ * Author  : Nakatsuji Masato 
+ * GitHub  : https://github.com/masatonakatsuji2021/Hachiware_tool
+ * npm     : https://www.npmjs.com/package/Hachiware_tool
+ * ===================================================================================================
  */
 
 module.exports = {
@@ -175,11 +181,22 @@ module.exports = {
 		return obj;
 	},
 
+	/**
+	 * ucFirst
+	 * @param {*} str 
+	 * @returns 
+	 */
 	ucFirst: function(str){
 		return str.substring(0,1).toUpperCase() + str.substring(1);
 	},
 
+	/**
+	 * lcFirst
+	 * @param {*} str 
+	 * @returns 
+	 */
 	lcFirst: function(str){
 		return str.substring(0,1).toLowerCase() + str.substring(1);
 	},
+	
 };
