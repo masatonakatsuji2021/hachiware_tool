@@ -1,4 +1,4 @@
-const tool = require("../");
+const tool = require("hachiware_tool");
 
 var b64 = tool.base64Encode("あいうえお0123456789");
 

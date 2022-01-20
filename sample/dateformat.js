@@ -1,4 +1,4 @@
-const tool = require("../");
+const tool = require("hachiware_tool");
 
 console.log(tool.getDateFormat("{DATETIME}"));
 console.log(tool.getDateFormat("{DATE}"));

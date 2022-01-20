@@ -198,5 +198,124 @@ module.exports = {
 	lcFirst: function(str){
 		return str.substring(0,1).toLowerCase() + str.substring(1);
 	},
-	
+
+	/**
+	 * hash
+	 * @param {*} hashStr 
+	 * @param {*} hashType 
+	 * @returns 
+	 */
+	hash: function(hashStr, hashType){
+		const crypto = require("crypto");
+
+		if(!hashStr){
+			hashStr = "";
+		}
+
+		if(!hashType){
+			hashType = "sha256";
+		}
+
+		return crypto.createHash(hashType).update(hashStr).digest("hex");
+	},
+
+	/**
+	 * randomHash
+	 * @param {*} hashStr 
+	 * @param {*} hashType 
+	 * @returns 
+	 */
+	randomHash: function(hashStr, hashType){
+		var d = new Date();
+
+		var random = Math.random();
+		hashStr += random.toString();
+
+		return this.hash(hashStr, hashType);
+	},
+
+	/**
+	 * _encOptSet
+	 * @param {*} option 
+	 * @returns 
+	 */
+	_encOptSet: function(option){
+
+		if(!option){
+			option = {};
+		}
+
+		if(!option.key){
+			option.key = "123456";
+		}
+
+		if(!option.salt){
+			option.salt = "abcdefg";
+		}
+
+		if(!option.ivSalt){
+			option.ivSalt = "0123456789ABCDEF";
+		}
+
+		if(!option.method){
+			option.method = "aes-256-cbc";
+		}
+
+		if(!option.inputEncode){
+			option.inputEncode = "utf8";
+		}
+
+		if(!option.outputEncode){
+			option.outputEncode = "hex";
+		}
+
+		return option;
+	},
+
+	/**
+	 * encode
+	 * @param {*} data 
+	 * @param {*} option 
+	 * @returns 
+	 */
+	encode: function(data, option){
+
+		option = this._encOptSet(option);
+
+		const crypto = require("crypto");
+
+		const key = crypto.scryptSync(option.key, option.salt, option.ivSalt.length * 2);
+		const iv = Buffer.from(option.ivSalt);
+
+		const cipher = crypto.createCipheriv(option.method, key ,iv);
+
+		var response = cipher.update(data, option.inputEncode, option.outputEncode);
+		response += cipher.final(option.outputEncode);
+
+		return response;
+	},
+
+	/**
+	 * decode
+	 * @param {*} data 
+	 * @param {*} option 
+	 * @returns 
+	 */
+	decode: function(data, option){
+
+		option = this._encOptSet(option);
+
+		const crypto = require("crypto");
+
+		const key = crypto.scryptSync(option.key, option.salt, option.ivSalt.length * 2);
+		const iv = Buffer.from(option.ivSalt);
+
+		const cipher = crypto.createDecipheriv(option.method, key ,iv);
+
+		var response = cipher.update(data, option.outputEncode, option.inputEncode);
+		response += cipher.final(option.inputEncode);
+
+		return response;
+	},
+
 };

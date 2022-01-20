@@ -1,4 +1,4 @@
-const tool = require("../");
+const tool = require("hachiware_tool");
 
 var string = "{name} .... {name2} or {name} .... {name}";
 

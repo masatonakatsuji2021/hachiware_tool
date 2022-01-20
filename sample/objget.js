@@ -1,4 +1,4 @@
-const tool = require("../");
+const tool = require("hachiware_tool");
 
 var obj = {
 	aaa: {

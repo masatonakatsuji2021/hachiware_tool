@@ -1,5 +1,5 @@
 const tool = require("hachiware_tool");
 
-console.log(tool.ucFirst("abcdefg"));
+console.log("ucFirst = " + tool.ucFirst("abcdefg"));
 
-console.log(tool.lcFirst("ABCDEFG"));
+console.log("lcFirst = " + tool.lcFirst("ABCDEFG"));
