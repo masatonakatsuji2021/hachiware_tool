@@ -435,4 +435,10 @@ console.log(dec);
 
 ---
 
-Author : Nakatsuji Masato.
+Hachiware_tool
+ 
+License : MIT License.   
+Author  : Nakatsuji Masato  
+HP URL  : [https://hachiware-js.com/](https://hachiware-js.com/)  
+GitHub  : [https://github.com/masatonakatsuji2021/Hachiware_tool](https://github.com/masatonakatsuji2021/Hachiware_tool)  
+npm     : [https://www.npmjs.com/package/Hachiware_tool](https://www.npmjs.com/package/Hachiware_tool)
