@@ -7,10 +7,14 @@
  * License : MIT License. 
  * Since   : 2022.01.15
  * Author  : Nakatsuji Masato 
+ * Email   : nakatsuji@teastalk.jp
+ * HP URL  : https://hachiware-js.com/
  * GitHub  : https://github.com/masatonakatsuji2021/Hachiware_tool
  * npm     : https://www.npmjs.com/package/Hachiware_tool
  * ===================================================================================================
  */
+
+const { ifError } = require("assert");
 
 module.exports = {
 
@@ -316,6 +320,52 @@ module.exports = {
 		response += cipher.final(option.inputEncode);
 
 		return response;
+	},
+
+	/**
+	 * transam
+	 * @param {*} option 
+	 * @returns 
+	 */
+	transam: function(option){
+		const { Worker } = require("worker_threads");
+
+		if(!option.limit){
+			option.imit = 1;
+		}
+
+		if(!option.callback){
+			option.callback = function(){};
+		}
+
+		var optData = {
+			aregment: option.data,
+			callback: option.callback.toString(),
+		};
+
+		for(var n = 0 ; n < option.limit ; n++){
+
+			optData.number = n;
+
+			var w = new Worker(__dirname + "/worker.js",{
+				workerData: optData,
+				callback: option.callback,
+			});	
+
+			w.on("message",function(message){
+				if(option.onMessage){
+					option.onMessage(message);
+				}
+			});
+	
+			w.on("exit",function(code){
+				if(option.onExit){
+					option.onExit(code);
+				}
+			});
+
+		}
+
 	},
 
 };
