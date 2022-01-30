@@ -14,15 +14,26 @@
  * ===================================================================================================
  */
 
-const { ifError } = require("assert");
+const { errorMonitor } = require("events");
 
 module.exports = {
 
 	/**
-	 * getDateFormat
-	 * @param {*} format 
-	 * @param {*} date 
-	 * @returns 
+	 * ### getDateFormat
+	 * Output date and time by specifying date and time format.
+	 * Convert shortcode to date and time information.
+	 * 
+	 * The implementation example is as follows
+	 * 
+	 * ```javascript
+	 * var datestr = tool.getDateFormat("{DATETIME}");
+	 * // Output the current date and time like "2021/01/30 11:01:32". 
+	 * ```
+	 * 
+	 * @param {string} format Output date format with shortcode
+	 * @param {Date} date Specified date class.  
+	 * If not specified, format conversion will be performed using the current date and time.
+	 * @returns {string} Converted date format string
 	 */
 	getDateFormat: function(format, date){
 
@@ -323,49 +334,361 @@ module.exports = {
 	},
 
 	/**
-	 * transam
-	 * @param {*} option 
-	 * @returns 
+	 * ### sparrow
+	 * Create another single thread to handle the process.
+	 * 
+	 * : The implementation example is as follows
+	 * 
+	 * ```javascript
+	 *  this.sparrow({
+	 *		data: {aa:"bbb",ccc:"dd"},
+	 *		start: function(number, data ,maxCore){
+	 * 				 * 
+	 *			var ind = 0;
+	 *			for(var n = 0 ; n < 100000000000 ; n++){
+	 *				ind++;
+	 *			}
+	 *		},
+	 *		exit: function(){
+	 *			console.log("Exit");
+	 *		},
+	 *	});
+	 * ```
+	 * 
+	 * @param {TransamOption} option Option information. The options that can be set are as follows.
+	 * 
+	 *  - data     : data to pass to the start callback.
+	 *  - start   : The start callback for each thread. The basic logic is described in this.
+	 *  - message : Callback in message reception event.
+	 *  - error   : Callback when an error occurs.
+	 *  - exit    : Callback in event when thread execution ends.
+	 * 
+	 * @returns {transam} transam class
+	 */
+	sparrow: function(option){
+
+		if(!option){
+			option = {};
+		}
+
+		option.limit = 1;
+		option.data = [ option.data ];
+
+		return this.transam(option);
+	},
+	
+	/**
+	 * ### transam
+	 * * Functions available only on Node.js  
+	 * Methods to improve performance.  
+	 * Temporary performance improvement is possible by starting threads for the number of CPU cores or less in parallel at the same time and distributing the processing.
+	 * 
+	 * It wraps worker_threads, but devises to simplify the code writing.
+	 * 
+	 * : The implementation example is as follows
+	 * 
+	 * ```javascript
+	 *  this.transam({
+	 *		data: {aa:"bbb",ccc:"dd"},
+	 *		start: function(number, data ,maxCore){
+	 * 			
+	 *			console.log("number = " + number);
+	 * 
+	 *			var ind = 0;
+	 *			for(var n = 0 ; n < 100000000000 ; n++){
+	 *				ind++;
+	 *			}
+	 *		},
+	 *		exit: function(number){
+	 *			console.log("Exit = " + number);
+	 *		},
+	 *		finnaly: function(){
+	 *			console.log(".....Compelte!");
+	 *		},
+	 *	});
+	 * ```
+	 * 
+	 * @param {TransamOption} option Option information. The options that can be set are as follows.
+	 * 
+	 *  - data    : data to pass to the start callback.
+	 *  - limit   : Number of threads to deploy  
+	 *              If omitted, the number of terminal CPU cores will be automatically assigned.
+	 *  - start   : The start callback for each thread. The basic logic is described in this.
+	 *  - message : Callback in message reception event.
+	 *  - error   : Callback when an error occurs.
+	 *  - exit    : Callback in event when thread execution ends.
+	 *  - finally : Callback when all threads have finished.
+	 * 
+	 * @returns {transam} transam class
 	 */
 	transam: function(option){
-		const { Worker } = require("worker_threads");
+		try{
+			const { Worker } = require("worker_threads");
+		}catch(error){
+			throw Error("The transam method is a feature available only in Node.js. \nYou cannot use the transam method in this mode.");
+		}
+
+		const os = require("os");
+
+		if(!option){
+			option = {};
+		}
 
 		if(!option.limit){
-			option.imit = 1;
+			option.limit = os.cpus().length;
 		}
 
-		if(!option.callback){
-			option.callback = function(){};
-		}
+		var transam = function(option){
 
-		var optData = {
-			aregment: option.data,
-			callback: option.callback.toString(),
+			const { Worker } = require("worker_threads");
+
+			var _data = {};
+			var _workers = [];
+			var _limit = option.limit;
+			var _exitCount = 0;
+
+			/**
+			 * ### limit
+			 * Number of threads to deploy  
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * tool.transam()
+			 * 		.limit(3)	// <= Use 3 threads.
+			 *....
+			 * ```
+			 * @param {number} limit Number of threads to allocate.
+			 * @returns {transam} transam class
+			 */
+			this.limit = function(limit){
+				_limit = limit;
+				return this;
+			};
+
+			/**
+			 * ### data
+			 * Specify the data to pass to the thread
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * this.transam()
+			 * 		.data({
+			 * 			aaa:"bbbb",
+			 * 			ccc:"dddd",
+			 * 		})
+			 *....
+			 * ```
+			 * 
+			 * * Only objects that do not include character strings and callback functions can be specified as data.
+			 * 
+			 * @param {*} data data to pass to the start callback.
+			 * @returns {transam} transam class
+			 */
+			this.data = function(data){
+				_data = data;
+				return this;
+			};
+
+			const onFinallyCheck = function(){
+
+				if(_exitCount != _limit){
+					return;
+				}
+
+				if(option.finally){
+					option.finally();
+				}
+			};
+
+			/**
+			 * ### start
+			 * Specify the callback to be executed at the start of thread startup
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * tool.transam()
+			 * 	.start(function(number, data, maxCpu){
+			 * 			
+			 * 		console.log("number= = " + number);
+			 * 		console.log("max = " + maxCup);
+			 * 		console.log(data);
+			 * 
+			 * 		var ind = 0;
+			 * 		for(var n = 0 ; n < 10 ^ 8 ; n++){
+			 * 			ind++;
+			 * 		}
+			 * 	})
+			 * ;
+			 * ```
+			 * 
+			 * @param {function} callback The start callback for each thread. The basic logic is described in this.
+			 * @returns {transam} transam class
+			 */
+			this.start = function(callback){
+
+				for(var n = 0 ; n < _limit ; n++){
+
+					var optData = {
+						callback: callback.toString(),
+						maxLength: _limit,
+						number: n,
+						data: _data[n],
+					};
+
+					var w_ = new Worker(__dirname + "/transam.js",{
+						workerData: optData,
+					});
+
+					_workers.push(w_);	
+				}
+
+				return this;
+			};
+
+			/**
+			 * ### message
+			 * Callback when receiving a message from a thread.
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * tool.transam()
+			 * 	.message(function(message){
+			 * 		console.log(message);
+			 * 	});
+			 * ```
+			 * 
+			 * @param {function} callback Callback when receiving a message
+			 * @returns {transam} transam class
+			 */
+			this.message = function(callback){
+
+				for(let n = 0 ; n < _limit ; n++){
+					var w_ = _workers[n];
+
+					w_.on("message", function(msg){
+						callback(n, msg);
+					});
+				}
+
+				return this;
+			};
+
+			/**
+			 * ### error
+			 * Specify a callback when an error occurs on the thread.
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * tool.transam()
+			 * 	.error(function(exception){
+			 * 		console.log(exception);
+			 * 	});
+			 * ```
+			 * 
+			 * @param {*} callback 
+			 * @returns {transam} transam class
+			 */
+			this.error = function(callback){
+				
+				for(let n = 0 ; n < _limit ; n++){
+					var w_ = _workers[n];
+
+					w_.on("error", function(exception){
+						_exitCount++;
+						callback(n, exception);
+						onFinallyCheck();
+					});
+				}
+
+				return this;
+			};
+
+			/**
+			 * ### exit
+			 * Specify a callback at the end of each thread.
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * tool.transam()
+			 * 	.exit(function(number, code){
+			 * 		console.log("Exit = " + number + "  Code = " + code);
+			 * 	});
+			 * ```
+			 * 
+			 * @param {function} callback Callback at the end of thread processing
+			 * @returns {transam} transam class
+			 */
+			this.exit = function(callback){
+				
+				for(let n = 0 ; n < _limit ; n++){
+					var w_ = _workers[n];
+					
+					w_.on("exit", function(code){
+						_exitCount++;
+						callback(n, code);
+						onFinallyCheck();
+					});
+				}
+
+				return this;
+			};
+
+			/**
+			 * ### finally
+			 * Specifies a callback to execute when all threads have finished.
+			 * 
+			 * The implementation sample is below.
+			 * 
+			 * ```javascript
+			 * tool.transam()
+			 * 	.finally(function(){
+			 * 		console.log("...Compelete!");
+			 * 	});
+			 * ```
+			 * 
+			 * @param {function} callback Callback when all threads have finished
+			 * @returns {transam} transam class
+			 */
+			this.finally = function(callback){
+				option.finally = callback;
+				return this;
+			};
+
 		};
 
-		for(var n = 0 ; n < option.limit ; n++){
+		var tam = new transam(option);
 
-			optData.number = n;
-
-			var w = new Worker(__dirname + "/worker.js",{
-				workerData: optData,
-				callback: option.callback,
-			});	
-
-			w.on("message",function(message){
-				if(option.onMessage){
-					option.onMessage(message);
-				}
-			});
-	
-			w.on("exit",function(code){
-				if(option.onExit){
-					option.onExit(code);
-				}
-			});
-
+		if(option.data){
+			tam.data(option.data);
 		}
 
+		if(option.start){
+			tam.start(option.start);
+		}
+
+		if(option.message){
+			tam.message(option.message);
+		}
+
+		if(option.error){
+			tam.error(option.error);
+		}
+
+		if(option.exit){
+			tam.exit(option.exit);
+		}
+		
+		if(option.finally){
+			tam.finally(option.finally);
+		}
+
+		return tam;
 	},
 
 };

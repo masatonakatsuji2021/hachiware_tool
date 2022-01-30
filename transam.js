@@ -17,10 +17,12 @@
 const { workerData, parentPort } = require("worker_threads");
 
 var callback = workerData.callback;
-var aregment = workerData.aregment;
+var data = workerData.data;
 var number = workerData.number;
+var maxLength = workerData.maxLength;
+var c = Function.call(null,"return " + callback)();
 
-const obj = new function(){
+const transamField = function(){
 
     this.send = function(message){
         parentPort.postMessage(message);
@@ -28,9 +30,13 @@ const obj = new function(){
     };
 
     this.exit = function(){
-        process.exit(0);
+        process.exit();
+    };
+
+    this.end = function(){
+        process.exit();
     };
 };
 
-var c = Function.call(null,"return " + callback)();
-c.bind(obj)(aregment, number);
+var t_ = new transamField();
+c.bind(t_)(number, data, maxLength);
