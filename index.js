@@ -105,13 +105,19 @@ module.exports = {
 	 * If not specified, generate with 32 characters.
 	 * @returns {string} Generated string
 	 */
-	uniqId: function(length){
+	uniqId: function(length, noSpecialChar){
 
 		if(!length){
 			length = 32;
 		}
 
-		const lbn = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=-_.}{,@+*";
+		var lbn = "";
+		if(noSpecialChar){
+			lbn = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+		}
+		else{
+			lbn = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=-_.}{,@+*";
+		}
 
 		var response = "";
 
