@@ -20,6 +20,7 @@ module.exports = {
 
 	/**
 	 * ### getDateFormat
+	 * 
 	 * Output date and time by specifying date and time format.
 	 * Convert shortcode to date and time information.
 	 * 
@@ -37,6 +38,7 @@ module.exports = {
 	 */
 	getDateFormat: function(format, date){
 
+		this.get
 		if(!date){
 			date = new Date();
 		}
@@ -68,9 +70,12 @@ module.exports = {
 	},
 
 	/**
-	 * base64Encode
-	 * @param {*} data 
-	 * @returns 
+	 * ### base64Encode
+	 * 
+	 * Convert to base64 format string
+	 * 
+	 * @param {string} data Character string to be converted
+	 * @returns {string} bas664 encode string
 	 */
 	base64Encode: function(data){
 		var res = Buffer.from(data).toString('base64');
@@ -78,9 +83,12 @@ module.exports = {
 	},
 
 	/**
-	 * base64Decode
-	 * @param {*} stringB64 
-	 * @returns 
+	 * ### base64Decode
+	 * 
+	 * Decode from base64 format to string.
+	 * 
+	 * @param {string} stringB64 bas64 encode string 
+	 * @returns {string} Character string after decoding
 	 */
 	base64Decode: function(stringB64){
 		var res = Buffer.from(stringB64, 'base64').toString();
@@ -88,9 +96,14 @@ module.exports = {
 	},
 
 	/**
-	 * uniqId
-	 * @param {*} length 
-	 * @returns 
+	 * ### uniqId
+	 * 
+	 * Randomly generate a unique and unique character string.
+	 * Since it is not a hash conversion, it can also be used with SPA.
+	 * 
+	 * @param {number} length String length to generate
+	 * If not specified, generate with 32 characters.
+	 * @returns {string} Generated string
 	 */
 	uniqId: function(length){
 
@@ -112,11 +125,14 @@ module.exports = {
 	},
 
 	/**
-	 * replaceAll
-	 * @param {*} target 
-	 * @param {*} replacement 
-	 * @param {*} source 
-	 * @returns 
+	 * ### replaceAll
+	 * 
+	 * Whole version of replace
+	 * 
+	 * @param {string} target Character string to be replaced
+	 * @param {string} replacement Replacement string
+	 * @param {string} source Target character string
+	 * @returns {string} Converted string
 	 */
 	replaceAll: function(target,replacement,source){
 		return source.split(target).join(replacement);
@@ -215,10 +231,15 @@ module.exports = {
 	},
 
 	/**
-	 * hash
-	 * @param {*} hashStr 
-	 * @param {*} hashType 
-	 * @returns 
+	 * ### hash
+	 * 
+	 * Hash generation method
+	 * * Available only on Node.js, not on SPA
+	 * 
+	 * @param {string} hashStr Hash generation character
+	 * @param {string} hashType Hash conversion format  
+	 * If not specified, hash generation with "sha256".
+	 * @returns {string} Hash generation string
 	 */
 	hash: function(hashStr, hashType){
 		const crypto = require("crypto");
